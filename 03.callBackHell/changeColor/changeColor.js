@@ -1,29 +1,82 @@
-let flag = 0;
-
-function func(time, colors, callback, reject) {
-  if (flag > colors.length) return;
-  const rand = Math.floor(Math.random() * 10);
-  if (biggerThenFive(rand)) {
-    if (time < 1000) time = 1000;
-  } else {
-    console.log("your request was rejected ☹");
-    console.log(`callback num: ${flag}`);
-    return;
-  }
-
+function changeColors(time, color, callback, reject) {
   setTimeout(() => {
-    changeColor(colors[flag]);
-    flag++;
-    func(time, colors);
+    const rand = Math.floor(Math.random() * 10);
+    if (rand > 5) {
+      changeBGColor(color);
+      callback();
+    } else {
+      reject();
+    }
   }, time);
 }
 
-function biggerThenFive(num) {
-  return num > 5;
+function reject(count) {
+  console.log(`${count} callback was rejected`);
 }
 
-function changeColor(color) {
+function changeBGColor(color) {
   document.body.style.backgroundColor = color;
 }
 
-func(300, ["red", "green", "yellow", "purple", "pink", "blue", "brown"]);
+changeColors(
+  1000,
+  "red",
+  () => {
+    changeColors(
+      1000,
+      "blue",
+      () => {
+        changeColors(
+          1000,
+          "purple",
+          () => {
+            changeColors(
+              1000,
+              "yellow",
+              () => {
+                changeColors(
+                  1000,
+                  "green",
+                  () => {
+                    changeColors(
+                      1000,
+                      "pink",
+                      () => {
+                        changeColors(
+                          1000,
+                          "brown",
+                          () => {},
+                          () => {
+                            reject(7);
+                          }
+                        );
+                      },
+                      () => {
+                        reject(6);
+                      }
+                    );
+                  },
+                  () => {
+                    reject(5);
+                  }
+                );
+              },
+              () => {
+                reject(4);
+              }
+            );
+          },
+          () => {
+            reject(3);
+          }
+        );
+      },
+      () => {
+        reject(2);
+      }
+    );
+  },
+  () => {
+    reject(1);
+  }
+);
