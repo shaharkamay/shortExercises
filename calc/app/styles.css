@@ -112,3 +112,7 @@ input[type=button]:hover {
 .top-margin{
     margin-top: 4px;
 }
+
+.result::before {
+    content: attr(data-content) "";
+}

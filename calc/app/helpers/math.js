@@ -23,8 +23,6 @@ export function percent(num) {
     return num / 100;
 }
 
-
-
 export function equal(num1, num2, calc) {
     return calc(num1, num2);
 }
