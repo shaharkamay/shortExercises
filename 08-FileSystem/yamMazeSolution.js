@@ -1,6 +1,6 @@
 const fs = require("fs");
 const path = require("path");
-// const generateMaze = require("./maze_generator/mazeGenerator");
+const generateMaze = require("./maze_generator/mazeGenerator");
 
 function findTreasureASync(roomPath, callback) {
   fs.access(path.resolve(__dirname, roomPath), fs.R_OK, (err) => {
@@ -15,20 +15,22 @@ function findTreasureASync(roomPath, callback) {
         return;
       }
 
-      fs.appendFile("map.txt", `.${roomPath.split("maze")[1]}\n`, (err) => {
+      fs.appendFile("map.txt", `.${roomPath.split("mazeX")[1]}\n`, (err) => {
         if (err) {
           callback("Cant write map");
           return;
         }
 
         for (let file of files) {
-            fs.stat(path.resolve(roomPath, file), (err, stats) => {
+          fs.stat(path.resolve(roomPath, file), (err, stats) => {
             if (err) {
               console.error("NO STATS");
               return;
             }
-            if(stats.isFile()) {
-                openChestASync(path.resolve(roomPath, file), (err, truessure) => {
+            if (stats.isFile()) {
+              openChestASync(
+                path.resolve(roomPath, file),
+                (err, truessure) => {
                   if (!err) {
                     callback(null, truessure);
                     return;
@@ -36,7 +38,7 @@ function findTreasureASync(roomPath, callback) {
                 }
               );
             }
-            });
+          });
         }
         callback(`Cant find tresure in ${files}`);
       });
@@ -80,7 +82,7 @@ function openChestASync(chestPath, callback) {
   });
 } // valid json
 
-findTreasureASync("maze", (err, treasure) => {
+findTreasureASync("mazeX", (err, treasure) => {
   if (err) {
     console.error(err);
     return;

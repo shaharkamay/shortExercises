@@ -1,13 +1,7 @@
 //08-FileSystem\maze-example\maze-solution.js
 const fs = require("fs");
-
 const basePath = "C:/dev/shortExercises/08-FileSystem/syncMaze";
 const mapArray = [];
-
-
-const mazeFilesArray =  folderToFileArray(basePath + "/maze"); //C:/dev/shortExercises/08-FileSystem/maze
-
-
 function mapToTreasure(mapArray) { //receives an array with the clues paths and set the map.txt
     let mapString = "";
     mapArray.forEach((cluePath) => {
@@ -25,8 +19,7 @@ function isTreasure(chestValue) { //receives chestValue and returns if treasure 
 }
 
 function findTreasureSync(dirPath) { //gets directory path and return new clue path
-    const filesArr = folderToFileArray(dirPath);
-    const nextPath = getFilesPaths(filesArr, dirPath);
+    const nextPath = getFilesPaths(folderToFileArray(dirPath), dirPath); //receives dirPath and array of filesNamed in that directory
     if(nextPath === true) {
         console.log("We found the treasure!");
         return mapArray;
@@ -36,20 +29,16 @@ function findTreasureSync(dirPath) { //gets directory path and return new clue p
 
 
 function getFilesPaths(filesArray, path) { //filesArray = ['room-0', '', '', 'chest-1.json', '', '']
-    let cluePath;
-    let treasure = false;
+    let {cluePath, treasure} = [null, false];
     filesArray.forEach((file) => {
-        if(!isFolder(file)) {
-            if(validateChest(file)) {
-                let filePath = `${path}/${file}`; // C:/dev/shortExercises/08-FileSystem/chest-1.json
-                const chestValue = getChestValue(filePath);
-                if(isTreasure(chestValue)) {
-                    treasure =  true;
-                } else if(validateClue(chestValue)) {
-                    const chestClue = getChestClue(filePath); // ./maze/room-1/room-0
-                    mapArray.push(chestClue.replace("/maze", ""));
-                    cluePath = `${basePath}${chestClue}`.replace(".", "");
-                }
+        if(!isFolder(file) && validateChest(file)) {
+            const chestValue = getChestValue(`${path}/${file}`);
+            if(isTreasure(chestValue)) {
+                treasure =  true;
+            } else if(validateClue(chestValue)) {
+                const chestClue = getChestClue(`${path}/${file}`); // ./maze/room-1/room-0
+                mapArray.push(chestClue.replace("/maze", ""));
+                cluePath = `${basePath}${chestClue}`.replace(".", "");
             }
         } 
     });
@@ -95,4 +84,4 @@ function validateClue(chestValue) { // {"clue":"./maze/room-1/room-0"}
     return null;
 }
 
-let clueTest = findTreasureSync(basePath + "/maze");
+findTreasureSync(basePath + "/maze");
