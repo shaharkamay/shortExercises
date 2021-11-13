@@ -6,8 +6,6 @@ const faker = require('faker');
 
 const studentsRouter = express.Router();
 
-mongoClient.init();
-
 studentsRouter.post('/', async (req, res, next) => {
     const student = req.body.student;
     const { name, surname, phone, gender, courses } = student;
