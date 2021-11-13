@@ -27,6 +27,16 @@ usersRouter.post('/', async (req, res, next) => {
     }
 });
 
+usersRouter.get('/', async (req, res, next) => {
+    try {
+        const user = await User.find({});
+        res.json(user)
+        res.end();
+    } catch (error) {
+        console.log(error);
+        next({ status: 502, message: 'Bad Geteway!' });
+    }
+})
 
 
 

@@ -28,6 +28,31 @@ postsRouter.post('/', async (req, res, next) => {
     }
 });
 
+postsRouter.get('/', async (req, res, next) => {
+    try {
+        const post = await Post.find({});
+        res.json(post)
+        res.end();
+    } catch (error) {
+        console.log(error);
+        next({ status: 502, message: 'Bad Geteway!' });
+    }
+})
 
+postsRouter.get('/username/:username', async (req, res, next) => {
+    const username = req.params.username;
+    if(username) {
+        try {
+            const posts = await Post.find({ username });
+            res.json(posts)
+            res.end();
+        } catch (error) {
+            console.log(error);
+            next({ status: 502, message: 'Bad Geteway!' });
+        }
+    } else {
+        next({ status: 401, message: 'Bad request!' })
+    }
+})
 
 module.exports = postsRouter;
