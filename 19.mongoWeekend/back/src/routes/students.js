@@ -2,6 +2,7 @@ const express = require('express');
 const moment = require('moment');
 const mongoClient = require('../mongoDb/client');
 const Student = require('../mongoDb/models/studentModel');
+const faker = require('faker');
 
 const studentsRouter = express.Router();
 
@@ -29,6 +30,37 @@ studentsRouter.post('/', async (req, res, next) => {
             }
     } else {
         next({ status: 401, message: 'Bad request!' })
+    }
+});
+
+studentsRouter.post('/faker/:num', async (req, res, next) => {
+    try {
+        const num = Number(req.params.num);
+        for (let i = 0; i < num; i++) {
+            const name = faker.name.firstName();
+            const surname = faker.name.lastName();
+            const birth = faker.date.between('01/01/1990', '01/01/2000');
+            const phone = faker.phone.phoneNumber('###-#######');
+            const genders = ['Male', 'Female'];
+            const gender = genders[Math.floor(Math.random() * genders.length)];
+            const coursesArr = ['JavaScript', 'Law', 'Java', 'Finance', 'Math'];
+            const courses = [];
+            const coursesCount = Math.floor(Math.random() * coursesArr.length) + 1;
+            for (let j = 0; j < coursesCount; j++) {
+                courses.push(coursesArr.splice([Math.floor(Math.random() * coursesArr.length)], 1)[0]);
+            }
+            try {
+                await new Student({ name, surname, birth, phone, gender, courses }).save();
+            } catch (error) {
+                console.log(error);
+                next({ status: 502, message: 'Bad Geteway!' });
+            }
+            
+        }
+        res.json('Students added successfully!')
+        res.end();
+    } catch (error) {
+        next({ status: 409, message: 'Cannot convert to number' });
     }
 });
 
@@ -116,5 +148,66 @@ studentsRouter.get('/phone', async (req, res, next) => {
     }
 })
 
+studentsRouter.put('/courses', async (req, res, next) => {
+    const course = 'JavaScript';
+    const name = 'Chen';
+    try {
+        const student = await Student.updateMany({ name }, { $push: { courses: course } });
+        res.json(student)
+        res.end();
+    } catch (error) {
+        console.log(error);
+        next({ status: 502, message: 'Bad Geteway!' });
+    }
+})
+
+studentsRouter.put('/birth', async (req, res, next) => {
+    const newBirth = moment('02/12/1998', 'DD/MM/YYYY').toDate();
+    const name = 'Koren';
+    try {
+        const student = await Student.updateOne({ name }, { birth: newBirth });
+        res.json(student)
+        res.end();
+    } catch (error) {
+        console.log(error);
+        next({ status: 502, message: 'Bad Geteway!' });
+    }
+})
+
+studentsRouter.get('/substr/:substr', async (req, res, next) => {
+    const substr = req.params.substr;
+    try {
+        const student = await Student.find({ name: { $regex: new RegExp(substr) } });
+        res.json(student)
+        res.end();
+    } catch (error) {
+        console.log(error);
+        next({ status: 502, message: 'Bad Geteway!' });
+    }
+})
+
+studentsRouter.delete('/name/:name', async (req, res, next) => {
+    const name = 'Ido';
+    try {
+        const student = await Student.deleteOne({ name });
+        res.json(student)
+        res.end();
+    } catch (error) {
+        console.log(error);
+        next({ status: 502, message: 'Bad Geteway!' });
+    }
+})
+
+studentsRouter.delete('/birth/:birth', async (req, res, next) => {
+    const birth = moment(req.params.birth, 'DD/MM/YYYY').toDate();
+    try {
+        const student = await Student.deleteOne({ birth: birth });
+        res.json(student)
+        res.end();
+    } catch (error) {
+        console.log(error);
+        next({ status: 502, message: 'Bad Geteway!' });
+    }
+})
 
 module.exports = { studentsRouter };
